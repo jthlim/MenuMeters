@@ -65,6 +65,8 @@
 	NSMutableDictionary				*updateMenuItems;
 	NSFont							*throughputFont;
 
+	NSString						*lastRxString;
+	NSString						*lastTxString;
 } // MenuMeterNetExtra
 
 @end

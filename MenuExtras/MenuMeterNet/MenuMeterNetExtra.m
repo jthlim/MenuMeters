@@ -281,10 +281,6 @@
 
 - (void)willUnload {
 
-	// Stop the timer
-	[updateTimer invalidate];  // Released by the runloop
-	updateTimer = nil;
-
 	// Unregister pref change notifications
 	[[NSDistributedNotificationCenter defaultCenter] removeObserver:self
 															   name:nil
@@ -303,7 +299,6 @@
 
 	[extraView release];
     [extraMenu release];
-	[updateTimer invalidate];  // Released by the runloop
 	[ourPrefs release];
 	[netConfig release];
 	[netStats release];
@@ -360,6 +355,46 @@
 	return currentImage;
 
 } // image
+
+-(BOOL) requiresRedraw {
+	int netDisplayModePrefs = [ourPrefs netDisplayMode];
+	// Draw displays
+	if (netDisplayModePrefs & kNetDisplayGraph) {
+		return YES;
+	}
+	if (netDisplayModePrefs & kNetDisplayArrows) {
+		return YES;
+	}
+	if (netDisplayModePrefs & kNetDisplayThroughput) {
+		double txValue = 0;
+		double rxValue = 0;
+		BOOL interfaceUp = [[preferredInterfaceConfig objectForKey:@"interfaceup"] boolValue];
+		if (interfaceUp) {
+			NSDictionary *primaryStats = [[netHistoryData lastObject] objectForKey:[preferredInterfaceConfig objectForKey:@"statname"]];
+			if (primaryStats) {
+				txValue = [[primaryStats objectForKey:@"deltaout"] doubleValue];
+				rxValue = [[primaryStats objectForKey:@"deltain"] doubleValue];
+			}
+		}
+		if (txValue < 0) { txValue = 0;	}
+		if (rxValue < 0) { rxValue = 0;	}
+		
+		// Construct strings
+		double sampleInterval = [ourPrefs netInterval];
+		NSNumber *sampleIntervalNum = [netHistoryIntervals lastObject];
+		if (!sampleIntervalNum && ([sampleIntervalNum doubleValue] > 0)) {
+			sampleInterval = [sampleIntervalNum doubleValue];
+		}
+		
+		NSString *txString = [self menubarThroughputStringForBytes:txValue inInterval:sampleInterval];
+		NSString *rxString = [self menubarThroughputStringForBytes:rxValue inInterval:sampleInterval];
+		
+		if([txString isEqual:lastTxString] && [rxString isEqual:lastRxString]) return NO;
+		lastTxString = [txString retain];
+		lastRxString = [rxString retain];
+	}
+	return YES;
+}
 
 // Boy does this need refactoring... *sigh*
 - (NSMenu *)menu {
