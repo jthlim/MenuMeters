@@ -19,7 +19,9 @@
     return self;
 }
 -(void)willUnload {
-#if !USE_TIMER_MANAGER
+#if USE_TIMER_MANAGER
+    [[TimerManager sharedTimerManager] invalidateTimerForTarget:self];
+#else
     [updateTimer invalidate];
     updateTimer = nil;
 #endif
@@ -34,11 +36,8 @@
         if (imageSize.width != oldImageSize.width || imageSize.height != oldImageSize.height) {
             canvas = [[NSImage alloc] initWithSize:imageSize];
         }
-        
-        NSImage *image = self.image;
-        [canvas lockFocus];
-        [image drawAtPoint:CGPointZero fromRect:(CGRect) {.size = image.size} operation:NSCompositeCopy fraction:1.0];
-        [canvas unlockFocus];
+
+        [self renderIntoImage:canvas];
         
         if (canvas != oldCanvas) {
             statusItem.button.image = canvas;
@@ -77,6 +76,13 @@
         statusItem=nil;
     }
 }
+
+- (void)renderIntoImage:(NSImage *)currentImage {
+    NSImage *image = self.image;
+    [currentImage lockFocus];
+    [image drawAtPoint:CGPointZero fromRect:(CGRect) {.size = image.size} operation:NSCompositeCopy fraction:1.0];
+    [currentImage unlockFocus];
+}   
 
 #pragma mark NSMenuDelegate
 - (void)menuNeedsUpdate:(NSMenu*)menu {

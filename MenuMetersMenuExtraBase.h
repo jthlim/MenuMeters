@@ -22,6 +22,8 @@
 - (void)configDisplay:(NSString*)bundleID fromPrefs:(MenuMeterDefaults*)ourPrefs withTimerInterval:(NSTimeInterval)interval;
 - (void)timerFired:(id)timer;
 
+- (void)renderIntoImage:(NSImage *)image;
+
 @property(nonatomic, readonly) BOOL requiresRedraw;
 @property(nonatomic, readonly) BOOL isMenuVisible;
 @end
