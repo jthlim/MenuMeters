@@ -323,6 +323,7 @@
 	float renderHeight = (float)[image size].height - 0.5f;  // Save space for baseline
 	int cpuGraphLength = [ourPrefs cpuGraphLength];
 	NSUInteger numberOfCPUs = [cpuInfo numberOfCPUs];
+	BOOL cpuAvgAllProcs = [ourPrefs cpuAvgAllProcs];
 	for (renderPosition = 0; renderPosition < cpuGraphLength; renderPosition++) {
 		// No data at this position?
 		if (renderPosition >= [loadHistory count]) break;
@@ -338,7 +339,7 @@
 		MenuMeterCPULoad *load = loadHistoryEntry[processor];
 		float system = load.system;
 		float user = load.user;
-		if ([ourPrefs cpuAvgAllProcs]) {
+		if (cpuAvgAllProcs) {
 			for (uint32_t cpuNum = 1; cpuNum < numberOfCPUs; cpuNum++) {
 				MenuMeterCPULoad *load = loadHistoryEntry[cpuNum];
 				system += load.system;
