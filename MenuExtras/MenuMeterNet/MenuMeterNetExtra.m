@@ -389,7 +389,9 @@
 		NSString *txString = [self menubarThroughputStringForBytes:txValue inInterval:sampleInterval];
 		NSString *rxString = [self menubarThroughputStringForBytes:rxValue inInterval:sampleInterval];
 		
-		if([txString isEqual:lastTxString] && [rxString isEqual:lastRxString]) return NO;
+		if([txString isEqual:lastTxString] && [rxString isEqual:lastRxString]) {
+			return NO;
+		}
 		lastTxString = [txString retain];
 		lastRxString = [rxString retain];
 	}
